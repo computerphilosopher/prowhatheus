@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/whatap/golib/net/oneway"
-	whash "github.com/whatap/golib/util/hash"
 
 	"github.com/whatap/golib/lang/pack"
 	"github.com/whatap/golib/logger"
+	whash "github.com/whatap/golib/util/hash"
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/prompb"
