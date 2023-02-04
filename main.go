@@ -39,6 +39,7 @@ func genPackTemplates(labels []prompb.Label, samples []prompb.Sample) []*pack.Ta
 		ret[i] = p
 	}
 	for _, p := range ret {
+		p.PutTag("oname", oname)
 		for _, l := range labels {
 			if l.Name == model.MetricNameLabel {
 				continue
