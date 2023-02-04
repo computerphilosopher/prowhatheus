@@ -1,5 +1,5 @@
 global:
-  scrape_interval: 1m #scraping 간격을 1분단위로 설정
+  scrape_interval: 5s
 
 remote_write:
   - url: http://host.docker.internal:19090/receive
