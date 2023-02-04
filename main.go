@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -9,12 +8,9 @@ import (
 
 	"github.com/whatap/golib/net/oneway"
 
-	"github.com/whatap/golib/lang/pack"
 	"github.com/whatap/golib/logger"
 	whash "github.com/whatap/golib/util/hash"
 
-	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/prompb"
 	"github.com/prometheus/prometheus/storage/remote"
 )
 
@@ -28,39 +24,6 @@ var (
 
 var tcpClient *oneway.OneWayTcpClient
 
-func genPackTemplates(labels []prompb.Label, samples []prompb.Sample) []*pack.TagCountPack {
-	ret := make([]*pack.TagCountPack, len(samples))
-	for i := range ret {
-		p := pack.NewTagCountPack()
-		p.Category = "prometheus"
-		p.Pcode = int64(pcode)
-		p.Oid = whash.HashStr(oname)
-
-		ret[i] = p
-	}
-	for _, p := range ret {
-		p.PutTag("oname", oname)
-		for _, l := range labels {
-			if l.Name == model.MetricNameLabel {
-				continue
-			}
-			p.PutTag(l.Name, l.Value)
-		}
-	}
-
-	return ret
-}
-
-func getDataName(labels []prompb.Label) (string, error) {
-	for _, l := range labels {
-		if l.Name == model.MetricNameLabel {
-			return l.Value, nil
-		}
-	}
-
-	return "", errors.New("name label is not exist")
-}
-
 func handler(w http.ResponseWriter, r *http.Request) {
 
 	req, err := remote.DecodeWriteRequest(r.Body)
@@ -70,22 +33,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, ts := range req.Timeseries {
-		dataName, err := getDataName(ts.Labels)
+		packs, err := generatePacksFromTimeSeries(ts)
 		if err != nil {
 			panic(err)
 		}
-		packs := genPackTemplates(ts.Labels, ts.Samples)
-
-		for i, sample := range ts.Samples {
-			packs[i].Time = ts.Samples[i].Timestamp
-			packs[i].Put(dataName, sample.Value)
-		}
-
-		for _, p := range packs {
-			err := tcpClient.SendFlush(p, true)
-			if err != nil {
-				panic(err)
-			}
+		err = sendPacks(packs)
+		if err != nil {
+			panic(err)
 		}
 	}
 
