@@ -44,7 +44,7 @@ func genPackTemplates(labels []prompb.Label, samples []prompb.Sample) []*pack.Ta
 			if l.Name == model.MetricNameLabel {
 				continue
 			}
-			p.Tags.PutString(l.Name, l.Value)
+			p.PutTag(l.Name, l.Value)
 		}
 	}
 
