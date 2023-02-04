@@ -56,9 +56,8 @@ func main() {
 	flag.StringVar(&whatapHost, "whatap-host", "13.209.172.35", "whatap host")
 	flag.StringVar(&listen, "listen", "0.0.0.0:19090", "listen address")
 	flag.Parse()
-	servers := make([]string, 0)
-	//servers = append(servers, fmt.Sprintf("%s:%d", "13.124.11.223", 6600))
-	servers = append(servers, fmt.Sprintf("%s:%d", whatapHost, 6600))
+
+	servers := []string{fmt.Sprintf("%s:%d", whatapHost, 6600)}
 	tcpClient = oneway.GetOneWayTcpClient(
 		oneway.WithServers(servers),
 		oneway.WithLicense(license),
