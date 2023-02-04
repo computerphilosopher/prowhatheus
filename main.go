@@ -19,9 +19,11 @@ import (
 )
 
 var (
-	license = ""
-	pcode   = 0
-	oname   = ""
+	license    = ""
+	pcode      = int64(0)
+	oname      = ""
+	whatapHost = ""
+	listen     = ""
 )
 
 var tcpClient *oneway.OneWayTcpClient
@@ -94,19 +96,24 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.StringVar(&license, "license", "", "whatap license")
-	flag.IntVar(&pcode, "pcode", 0, "whatap pcode")
+	flag.Int64Var(&pcode, "pcode", 0, "whatap pcode")
 	flag.StringVar(&oname, "oname", "skynet", "agent oname")
+	flag.StringVar(&whatapHost, "whatap-host", "13.209.172.35", "whatap host")
+	flag.StringVar(&listen, "listen", "0.0.0.0:19090", "listen address")
 	flag.Parse()
 	servers := make([]string, 0)
-	servers = append(servers, fmt.Sprintf("%s:%d", "13.124.11.223", 6600))
+	//servers = append(servers, fmt.Sprintf("%s:%d", "13.124.11.223", 6600))
+	servers = append(servers, fmt.Sprintf("%s:%d", whatapHost, 6600))
 	tcpClient = oneway.GetOneWayTcpClient(
 		oneway.WithServers(servers),
 		oneway.WithLicense(license),
+		oneway.WithPcode(pcode),
+		oneway.WithOid(whash.HashStr(oname)),
 		oneway.WithUseQueue(),
 		oneway.WithLogger(logger.NewDefaultLogger()),
 	)
 	defer tcpClient.Close()
 
 	http.HandleFunc("/receive", handler)
-	log.Fatal("listen 0.0.0.0:19090", http.ListenAndServe("0.0.0.0:19090", nil))
+	log.Fatal("listen", listen, http.ListenAndServe(listen, nil))
 }
