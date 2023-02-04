@@ -98,6 +98,7 @@ func main() {
 	flag.StringVar(&license, "license", "", "whatap license")
 	flag.IntVar(&pcode, "pcode", 0, "whatap pcode")
 	flag.StringVar(&oname, "oname", "skynet", "agent oname")
+	flag.Parse()
 	servers := make([]string, 0)
 	servers = append(servers, fmt.Sprintf("%s:%d", "13.124.11.223", 6600))
 	tcpClient = oneway.GetOneWayTcpClient(
