@@ -107,6 +107,7 @@ func main() {
 		oneway.WithUseQueue(),
 		oneway.WithLogger(logger.NewDefaultLogger()),
 	)
+	defer tcpClient.Close()
 
 	http.HandleFunc("/receive", handler)
 	log.Fatal("listen 0.0.0.0:19090", http.ListenAndServe("0.0.0.0:19090", nil))
