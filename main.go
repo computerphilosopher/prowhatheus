@@ -84,8 +84,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				panic(err)
 			}
 		}
-
-		fmt.Printf("%s is flushed to %s\n", dataName, "13.124.11.223:6600")
 	}
 
 	if err != nil {
