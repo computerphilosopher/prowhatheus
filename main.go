@@ -32,8 +32,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, ts := range req.Timeseries {
-		packs, err := generatePacksFromTimeSeries(ts)
+	if req.Metadata == nil {
+		http.Error(w, "metadata is nil", http.StatusBadRequest)
+		return
+	}
+	if len(req.Timeseries) != len(req.Metadata) {
+		http.Error(w, "timeseries and metadata must be one to one mapped", http.StatusBadRequest)
+		return
+	}
+
+	for i, ts := range req.Timeseries {
+		packs, err := generatePacksFromTimeSeries(ts, req.Metadata[i])
 		if err != nil {
 			panic(err)
 		}

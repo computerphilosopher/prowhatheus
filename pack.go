@@ -50,7 +50,7 @@ func getDataName(labels []prompb.Label) (string, error) {
 	return "", errors.New("name label is not exist")
 }
 
-func generatePacksFromTimeSeries(ts prompb.TimeSeries) ([]*pack.TagCountPack, error) {
+func generatePacksFromTimeSeries(ts prompb.TimeSeries, metadata prompb.MetricMetadata) ([]*pack.TagCountPack, error) {
 	dataName, err := getDataName(ts.Labels)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func generatePacksFromTimeSeries(ts prompb.TimeSeries) ([]*pack.TagCountPack, er
 
 	for i, sample := range ts.Samples {
 		packs[i].Time = ts.Samples[i].Timestamp
-		packs[i].Put(dataName, sample.Value)
+		packs[i].Put(dataName, NewMetric(sample, metadata).Value())
 	}
 
 	return packs, nil
